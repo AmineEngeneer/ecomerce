@@ -1,0 +1,80 @@
+@import "tailwindcss";
+
+@theme {
+  --font-serif: 'Fraunces', Georgia, serif;
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-sans: 'Work Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: 'Work Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  --color-ink: #17181C;
+  --color-paper: #F2F1ED;
+  --color-forest: #2F4739;
+  --color-brass: #A6824C;
+  --color-stone: #8B7A72;
+}
+
+:root {
+  --color-ink: #17181C;
+  --color-paper: #F2F1ED;
+  --color-forest: #2F4739;
+  --color-brass: #A6824C;
+  --color-stone: #8B7A72;
+  --color-hairline: rgba(139, 122, 114, 0.2);
+
+  --background: #F2F1ED;
+  --foreground: #17181C;
+  --card: #F2F1ED;
+  --card-foreground: #17181C;
+  --popover: #F2F1ED;
+  --popover-foreground: #17181C;
+  --primary: #17181C;
+  --primary-foreground: #F2F1ED;
+  --secondary: #2F4739;
+  --secondary-foreground: #F2F1ED;
+  --muted: rgba(139, 122, 114, 0.12);
+  --muted-foreground: #8B7A72;
+  --accent: #A6824C;
+  --accent-foreground: #17181C;
+  --destructive: #8B261D;
+  --destructive-foreground: #F2F1ED;
+  --border: rgba(139, 122, 114, 0.2);
+  --input: rgba(139, 122, 114, 0.2);
+  --ring: #A6824C;
+  --radius: 0px;
+}
+
+body {
+  font-family: 'Work Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: #F2F1ED;
+  color: #17181C;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, .font-display {
+  font-family: 'Fraunces', Georgia, serif;
+}
+
+/* Enforce strict zero-radius & zero-shadow discipline */
+* {
+  border-radius: 0px !important;
+  box-shadow: none !important;
+}
+
+/* Max 2px on form inputs only per Section 18 */
+input, textarea, select {
+  border-radius: 2px !important;
+}
+
+/* Hairline border utility */
+.border-hairline {
+  border-color: rgba(139, 122, 114, 0.2);
+}
+.border-b-hairline {
+  border-bottom-color: rgba(139, 122, 114, 0.2);
+}
+.border-t-hairline {
+  border-top-color: rgba(139, 122, 114, 0.2);
+}
+
