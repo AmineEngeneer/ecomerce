@@ -76,10 +76,12 @@ export default function App() {
         api.getProducts(),
         api.getCategories(),
       ]);
-      setHomeProducts(pRes.products);
-      setHomeCategories(cRes.categories);
+      setHomeProducts(Array.isArray(pRes?.products) ? pRes.products : []);
+      setHomeCategories(Array.isArray(cRes?.categories) ? cRes.categories : []);
     } catch (err) {
       console.error(err);
+      setHomeProducts([]);
+      setHomeCategories([]);
     }
   };
 

@@ -12,13 +12,15 @@ interface HomePageProps {
 }
 
 export const HomePage: React.FC<HomePageProps> = ({
-  products,
-  categories,
+  products = [],
+  categories = [],
   onNavigate,
   onAddToCart,
   onBuyNow,
 }) => {
-  const featured = products.slice(0, 4);
+  const safeProducts = Array.isArray(products) ? products : [];
+  const safeCategories = Array.isArray(categories) ? categories : [];
+  const featured = safeProducts.slice(0, 4);
 
   return (
     <div className="space-y-24 pb-24">
@@ -116,7 +118,7 @@ export const HomePage: React.FC<HomePageProps> = ({
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {categories.map((cat) => (
+          {safeCategories.map((cat) => (
             <div
               key={cat.id}
               onClick={() => onNavigate(`/products?category=${cat.slug}`)}

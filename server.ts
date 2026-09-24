@@ -38,21 +38,9 @@ if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
-// Multer disk storage for local image uploads
-const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => {
-    cb(null, uploadsDir);
-  },
-  filename: (_req, file, cb) => {
-    const ext = path.extname(file.originalname).toLowerCase();
-    const safeName = `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
-    cb(null, safeName);
-  },
-});
-
 const upload = multer({
-  storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB max
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
     const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/avif', 'image/gif'];
     if (allowed.includes(file.mimetype)) {
@@ -63,9 +51,8 @@ const upload = multer({
   },
 });
 
-async function startServer() {
+async function createApp() {
   const app = express();
-  const PORT = 3000;
 
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
@@ -887,13 +874,26 @@ async function startServer() {
   // IMAGE UPLOAD (LOCAL STORAGE ABSTRACTION)
   // ==========================================
 
-  app.post('/api/upload', requireAdmin, upload.single('image'), (req, res) => {
+  app.post('/api/upload', requireAdmin, upload.single('image'), async (req, res) => {
     try {
       if (!req.file) {
         return res.status(400).json({ error: 'No image file uploaded' });
       }
-      const fileUrl = `/uploads/${req.file.filename}`;
-      return res.json({ url: fileUrl });
+
+      const ext = path.extname(req.file.originalname).toLowerCase();
+      const safeName = `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
+
+      if (process.env.BLOB_READ_WRITE_TOKEN) {
+        const { put } = await import('@vercel/blob');
+        const blob = await put(safeName, req.file.buffer, {
+          access: 'public',
+          token: process.env.BLOB_READ_WRITE_TOKEN,
+        });
+        return res.json({ url: blob.url });
+      }
+
+      fs.writeFileSync(path.join(uploadsDir, safeName), req.file.buffer);
+      return res.json({ url: `/uploads/${safeName}` });
     } catch (err) {
       console.error('[Upload Error]:', err);
       return res.status(500).json({ error: 'Failed to process file upload' });
@@ -1464,6 +1464,13 @@ async function startServer() {
     }
   });
 
+  return app;
+}
+
+async function runLocalServer() {
+  const app = await createApp();
+  const PORT = 3000;
+
   // ==========================================
   // VITE DEV MIDDLEWARE OR PRODUCTION SERVE
   // ==========================================
@@ -1492,4 +1499,8 @@ async function startServer() {
   });
 }
 
-startServer();
+if (!process.env.VERCEL) {
+  runLocalServer();
+}
+
+export { createApp };
